@@ -27,14 +27,15 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by filipp on 6/16/2016.
- */
+
+
 public class GPS_Service extends Service {
 
     private LocationListener listener;
     private LocationManager locationManager;
     private FirebaseFirestore db;
+    public static int squareValue1 = 0;
+    public static int squareValue2 = 0;
 
     @Nullable
     @Override
@@ -67,30 +68,26 @@ public class GPS_Service extends Service {
                 double endLat = 52.003344;
                 double addLat = (endLat-startLat)/10;
 
-                int xVak = 0;
-                char yVak = 0;
-                String vak;
-
-
                 if (lon < startLon || lon > (startLon + 10*addLon) || lat < startLat || lat > (startLat + 10*addLat)){
-                    vak = "None";
+                    squareValue1 = 11;
+                    squareValue2 = 11;
                 }
                 else {
                     // Loop y vakken
                     for (int j=0; j<10; j++){
 
                         if (lat > startLat && lat < startLat + addLat){
-                            System.out.println("yVak: " +yVak);
+                            System.out.println("yVak: " +squareValue2);
                             break;}
                         startLat = startLat + addLat;
-                        yVak ++;
+                        squareValue2 ++;
                     }
 
                     // Loop x vakken
                     for (int k=0; k<10; k++){
-                        xVak ++;
+                        squareValue1 ++;
                         if (lon > startLon && lon < startLon + addLon){
-                            System.out.println("xVak: " +xVak);
+                            System.out.println("xVak: " +squareValue1);
                             break;}
 
                         startLon = startLon + addLon;
@@ -98,14 +95,18 @@ public class GPS_Service extends Service {
                     }
 
                     System.out.println("Lon= "+lon+ " Lat= "+lat);
-                    System.out.println("xVak= "+xVak);
-                    System.out.println("yVak= " +yVak);
+                    System.out.println("xVak= "+squareValue1);
+                    System.out.println("yVak= " +squareValue2);
 
-                    vak = Integer.toString(xVak)+yVak;
                 }
-                service.sendToDb(vak);
-                service.readFromDB(vak);
-                i.putExtra("coordinates",location.getLongitude()+" "+location.getLatitude()+" vak: "+ vak);
+                String squareValue1String = Integer.toString(squareValue1);
+                String squareValue2String = Integer.toString(squareValue2);
+
+                service.sendToDb(squareValue1String);
+                service.sendToDb(squareValue2String);
+                service.readFromDB(squareValue1String);
+                service.readFromDB(squareValue2String);
+                i.putExtra("coordinates",location.getLongitude()+" "+location.getLatitude()+" vak: "+ squareValue1 + "  "+squareValue2 );
                 sendBroadcast(i);
             }
 
@@ -137,7 +138,8 @@ public class GPS_Service extends Service {
     public void sendToDb(String vak) {
         // Create a new user with a first and last name
         Map<String, Object> value = new HashMap<>();
-        value.put("vak", vak);
+        value.put("Square1", squareValue1);
+        value.put("Square2",squareValue2);
         value.put("time", System.currentTimeMillis());
 
         db.collection("locations")
@@ -161,16 +163,18 @@ public class GPS_Service extends Service {
         CollectionReference locationsRef = db.collection("locations");
         locationsRef.whereGreaterThan("time", System.currentTimeMillis() - 30000)
                 .orderBy("time")
-                .orderBy("vak")
+                .orderBy("Square1")
+                .orderBy("Square2")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d("Firebase dataset", document.getId() + " => " + document.getData());
+                                        Log.d("Firebase dataset", document.getId() + " => " + document.getData());
                             }
                         } else {
+
                             Log.w("Firebase", "Error getting documents.", task.getException());
                         }
                     }

@@ -21,6 +21,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -136,10 +137,19 @@ public class MainActivity extends AppCompatActivity {
         myCustomFont= Typeface.createFromAsset(getAssets(),"fonts/futura_medium.otf");
         text2.setTypeface(myCustomFont);
 
-        matrix[1][4]=14;
-        matrix[4][2]=7;
+        matrix[1][5]=4;
+        int squareValue1 = GPS_Service.squareValue1;
+        int squareValue2 = GPS_Service.squareValue2;
 
 
+
+        for (int i=0; i<10; i++) {
+            for (int j = 0; j < 10; j++) {
+                if (i == squareValue1 && j == squareValue2) {
+                    matrix[i][j]++;
+                }
+            }
+        }
 
 
         for (int i=0; i<10; i++){
