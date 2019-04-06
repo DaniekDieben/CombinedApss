@@ -1,0 +1,44 @@
+{
+  "project_info": {
+    "project_number": "964986852947",
+    "firebase_url": "https://locationtracker-eff4c.firebaseio.com",
+    "project_id": "locationtracker-eff4c",
+    "storage_bucket": "locationtracker-eff4c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:964986852947:android:9111ac3d5184b4bf",
+        "android_client_info": {
+          "package_name": "testing.gps_service"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "964986852947-1eiftndjku0d8bu2mnqmlbegs603v55h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "testing.gps_service",
+            "certificate_hash": "9da42dfecdf65a249e5e97c8e2724a5a2d460f78"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-CkFzThC31LPIY7kqvw_FrhmQbd-BuS0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "964986852947-o29jkn9021cf0hpigjijr7oqcscg8mof.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
