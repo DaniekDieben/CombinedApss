@@ -34,8 +34,7 @@ public class GPS_Service extends Service {
     private LocationListener listener;
     private LocationManager locationManager;
     private FirebaseFirestore db;
-    public static int squareValue1 = 0;
-    public static int squareValue2 = 0;
+
 
     @Nullable
     @Override
@@ -45,7 +44,6 @@ public class GPS_Service extends Service {
 
     @Override
     public void onCreate() {
-
 
         FirebaseApp.initializeApp(this);
         db = FirebaseFirestore.getInstance();
@@ -68,45 +66,52 @@ public class GPS_Service extends Service {
                 double endLat = 52.003344;
                 double addLat = (endLat-startLat)/10;
 
+                int xVak = 0;
+                int yVak = 0;
+                String vak;
+
+
+
                 if (lon < startLon || lon > (startLon + 10*addLon) || lat < startLat || lat > (startLat + 10*addLat)){
-                    squareValue1 = 11;
-                    squareValue2 = 11;
+                    vak = "None";
                 }
                 else {
                     // Loop y vakken
                     for (int j=0; j<10; j++){
-
                         if (lat > startLat && lat < startLat + addLat){
-                            System.out.println("yVak: " +squareValue2);
+                            System.out.println("yVak: " +yVak);
                             break;}
                         startLat = startLat + addLat;
-                        squareValue2 ++;
+                        System.out.println(yVak);
+                        yVak ++;
                     }
 
                     // Loop x vakken
                     for (int k=0; k<10; k++){
-                        squareValue1 ++;
                         if (lon > startLon && lon < startLon + addLon){
-                            System.out.println("xVak: " +squareValue1);
+                            System.out.println("xVak: " +xVak);
                             break;}
-
                         startLon = startLon + addLon;
+                        xVak ++;
 
                     }
 
                     System.out.println("Lon= "+lon+ " Lat= "+lat);
-                    System.out.println("xVak= "+squareValue1);
-                    System.out.println("yVak= " +squareValue2);
+                    System.out.println("xVak end= "+xVak);
+                    System.out.println("yVak end= " +yVak);
+
+                    vak = Integer.toString(xVak)+yVak;
+                    service.readFromDB(vak);
 
                 }
-                String squareValue1String = Integer.toString(squareValue1);
-                String squareValue2String = Integer.toString(squareValue2);
 
-                service.sendToDb(squareValue1String);
-                service.sendToDb(squareValue2String);
-                service.readFromDB(squareValue1String);
-                service.readFromDB(squareValue2String);
-                i.putExtra("coordinates",location.getLongitude()+" "+location.getLatitude()+" vak: "+ squareValue1 + "  "+squareValue2 );
+                System.out.println("Send to Db");
+                service.sendToDb(vak);
+
+                System.out.println("Read from Db");
+                service.readFromDB(vak);
+
+                i.putExtra("coordinates",location.getLongitude()+" "+location.getLatitude()+" vak: "+ vak);
                 sendBroadcast(i);
             }
 
@@ -131,18 +136,17 @@ public class GPS_Service extends Service {
         locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
 
         //noinspection MissingPermission
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,3000,0,listener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,10000,0,listener);
 
     }
 
     public void sendToDb(String vak) {
         // Create a new user with a first and last name
         Map<String, Object> value = new HashMap<>();
-        value.put("Square1", squareValue1);
-        value.put("Square2",squareValue2);
+        value.put("Square", vak);
         value.put("time", System.currentTimeMillis());
 
-        db.collection("locations")
+        db.collection("locations_8-4-3")
                 .add(value)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
@@ -158,20 +162,22 @@ public class GPS_Service extends Service {
                 });
     }
 
+
     public void readFromDB(String vak) {
         // Get data, order data "vak" (Poging 1 )
-        CollectionReference locationsRef = db.collection("locations");
-        locationsRef.whereGreaterThan("time", System.currentTimeMillis() - 30000)
+        Log.d("In read from", "In read from");
+        CollectionReference locationsRef = db.collection("locations_8-4-3");
+        locationsRef.whereGreaterThan("time", System.currentTimeMillis() - 60000)
                 .orderBy("time")
-                .orderBy("Square1")
-                .orderBy("Square2")
+                .orderBy("vak")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                        Log.d("Firebase dataset", document.getId() + " => " + document.getData());
+
+                                Log.d("Firebase dataset", document.getId() + " => " + document.getData());
                             }
                         } else {
 

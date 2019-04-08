@@ -138,8 +138,11 @@ public class MainActivity extends AppCompatActivity {
         text2.setTypeface(myCustomFont);
 
         matrix[1][5]=4;
-        int squareValue1 = GPS_Service.squareValue1;
-        int squareValue2 = GPS_Service.squareValue2;
+//        int squareValue1 = GPS_Service.squareValue1;
+//        int squareValue2 = GPS_Service.squareValue2;
+
+        int squareValue2=0;
+        int squareValue1=0;
 
 
 

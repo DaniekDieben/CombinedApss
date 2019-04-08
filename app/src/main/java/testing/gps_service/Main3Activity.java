@@ -8,14 +8,15 @@ import android.widget.Button;
 
 public class Main3Activity extends AppCompatActivity {
 
-    Button btn;
+    Button btn_back;
+    Button btn_menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main3);
-        btn = (Button) findViewById(R.id.button);
-        btn.setOnClickListener(new View.OnClickListener() {
+        btn_back = (Button) findViewById(R.id.go_back);
+        btn_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Main3Activity.this, MainActivity.class);
