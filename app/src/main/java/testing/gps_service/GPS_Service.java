@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -24,6 +25,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,6 +36,8 @@ public class GPS_Service extends Service {
     private LocationListener listener;
     private LocationManager locationManager;
     private FirebaseFirestore db;
+    public static Map get_info;
+    public static ArrayList all_data;
 
 
     @Nullable
@@ -70,8 +74,6 @@ public class GPS_Service extends Service {
                 int yVak = 0;
                 String vak;
 
-
-
                 if (lon < startLon || lon > (startLon + 10*addLon) || lat < startLat || lat > (startLat + 10*addLat)){
                     vak = "None";
                 }
@@ -95,14 +97,11 @@ public class GPS_Service extends Service {
                         xVak ++;
 
                     }
-
                     System.out.println("Lon= "+lon+ " Lat= "+lat);
                     System.out.println("xVak end= "+xVak);
                     System.out.println("yVak end= " +yVak);
 
                     vak = Integer.toString(xVak)+yVak;
-                    service.readFromDB(vak);
-
                 }
 
                 System.out.println("Send to Db");
@@ -151,6 +150,7 @@ public class GPS_Service extends Service {
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
+
                         Log.d("Firebase", "DocumentSnapshot added with ID: " + documentReference.getId());
                     }
                 })
@@ -162,25 +162,27 @@ public class GPS_Service extends Service {
                 });
     }
 
-
     public void readFromDB(String vak) {
         // Get data, order data "vak" (Poging 1 )
         Log.d("In read from", "In read from");
+        all_data =  new ArrayList<>();
         CollectionReference locationsRef = db.collection("locations_8-4-3");
         locationsRef.whereGreaterThan("time", System.currentTimeMillis() - 60000)
                 .orderBy("time")
-                .orderBy("vak")
+                .orderBy("Square")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-
+                                get_info= document.getData();
+                                System.out.println("output eind midden" +get_info);
+                                all_data.add(get_info);
                                 Log.d("Firebase dataset", document.getId() + " => " + document.getData());
                             }
+                            System.out.println("List: " +all_data);
                         } else {
-
                             Log.w("Firebase", "Error getting documents.", task.getException());
                         }
                     }

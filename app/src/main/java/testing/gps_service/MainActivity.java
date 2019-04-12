@@ -25,6 +25,10 @@ import android.widget.TextView;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Map;
+
 public class MainActivity extends AppCompatActivity {
 
 //    private TableLayout table;
@@ -138,6 +142,20 @@ public class MainActivity extends AppCompatActivity {
         text2.setTypeface(myCustomFont);
 
         matrix[1][5]=4;
+        Map square = GPS_Service.get_info;
+        ArrayList data_array = GPS_Service.all_data;
+        System.out.println("HELLO");
+
+        System.out.println("List in main"+ data_array);
+//
+//        for (int i = data_array.size(); i>0; i--){
+//            String squareVal = data_array.get(i);
+//
+//            data_array.remove(i);
+//        }
+
+
+
 //        int squareValue1 = GPS_Service.squareValue1;
 //        int squareValue2 = GPS_Service.squareValue2;
 
