@@ -7,6 +7,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -36,9 +37,6 @@ public class GPS_Service extends Service {
     private LocationListener listener;
     private LocationManager locationManager;
     private FirebaseFirestore db;
-    public static Map get_info;
-    public static ArrayList all_data;
-
 
     @Nullable
     @Override
@@ -62,12 +60,12 @@ public class GPS_Service extends Service {
                 double lon = location.getLongitude();
                 double lat = location.getLatitude();
 
-                double startLon = 4.374030;
-                double endLon = 4.377568;
+                double startLon = 4.335499;
+                double endLon = 4.3366;
                 double addLon = (endLon-startLon)/10;
 
-                double startLat = 52.002;
-                double endLat = 52.003344;
+                double startLat = 51.994545;
+                double endLat = 51.996;
                 double addLat = (endLat-startLat)/10;
 
                 int xVak = 0;
@@ -103,12 +101,8 @@ public class GPS_Service extends Service {
 
                     vak = Integer.toString(xVak)+yVak;
                 }
-
                 System.out.println("Send to Db");
                 service.sendToDb(vak);
-
-                System.out.println("Read from Db");
-                service.readFromDB(vak);
 
                 i.putExtra("coordinates",location.getLongitude()+" "+location.getLatitude()+" vak: "+ vak);
                 sendBroadcast(i);
@@ -133,10 +127,8 @@ public class GPS_Service extends Service {
         };
 
         locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-
         //noinspection MissingPermission
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,10000,0,listener);
-
     }
 
     public void sendToDb(String vak) {
@@ -162,32 +154,6 @@ public class GPS_Service extends Service {
                 });
     }
 
-    public void readFromDB(String vak) {
-        // Get data, order data "vak" (Poging 1 )
-        Log.d("In read from", "In read from");
-        all_data =  new ArrayList<>();
-        CollectionReference locationsRef = db.collection("locations_8-4-3");
-        locationsRef.whereGreaterThan("time", System.currentTimeMillis() - 60000)
-                .orderBy("time")
-                .orderBy("Square")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                get_info= document.getData();
-                                System.out.println("output eind midden" +get_info);
-                                all_data.add(get_info);
-                                Log.d("Firebase dataset", document.getId() + " => " + document.getData());
-                            }
-                            System.out.println("List: " +all_data);
-                        } else {
-                            Log.w("Firebase", "Error getting documents.", task.getException());
-                        }
-                    }
-                });
-    }
 
 
     @Override
@@ -198,4 +164,5 @@ public class GPS_Service extends Service {
             locationManager.removeUpdates(listener);
         }
     }
+
 }

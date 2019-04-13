@@ -11,9 +11,11 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -22,11 +24,18 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firestore.v1.Value;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
@@ -49,6 +58,16 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver broadcastReceiver;
 
     private FirebaseFirestore db;
+    public ArrayList all_data;
+    public Map get_info;
+    public List list_with_values;
+    private int x_square;
+    private int y_square;
+
+    final MainActivity service = this;
+
+
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -57,8 +76,6 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onReceive(Context context, Intent intent) {
                     System.out.println("\n" +intent.getExtras().get("coordinates"));
-
-
                 }
             };
         }
@@ -79,11 +96,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        final Handler handler = new Handler();
+        // 5 sec
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                service.readFromDB();
+                handler.postDelayed(this, 10000);
+            }
+        };
+        handler.postDelayed(r,10000);
+
+
         btn_start = (Button) findViewById(R.id.start);
         btn_stop = (Button) findViewById(R.id.stop);
-
-//        Typeface myCustomFont=Typeface.createFromAsset(getAssets(), "fonts/Adv.ttf");
-//        textView.setTypeface(myCustomFont);
 
         FirebaseApp.initializeApp(this);
         db = FirebaseFirestore.getInstance();
@@ -141,65 +167,7 @@ public class MainActivity extends AppCompatActivity {
         myCustomFont= Typeface.createFromAsset(getAssets(),"fonts/futura_medium.otf");
         text2.setTypeface(myCustomFont);
 
-        matrix[1][5]=4;
-        Map square = GPS_Service.get_info;
-        ArrayList data_array = GPS_Service.all_data;
-        System.out.println("HELLO");
-
-        System.out.println("List in main"+ data_array);
-//
-//        for (int i = data_array.size(); i>0; i--){
-//            String squareVal = data_array.get(i);
-//
-//            data_array.remove(i);
-//        }
-
-
-
-//        int squareValue1 = GPS_Service.squareValue1;
-//        int squareValue2 = GPS_Service.squareValue2;
-
-        int squareValue2=0;
-        int squareValue1=0;
-
-
-
-        for (int i=0; i<10; i++) {
-            for (int j = 0; j < 10; j++) {
-                if (i == squareValue1 && j == squareValue2) {
-                    matrix[i][j]++;
-                }
-            }
-        }
-
-
-        for (int i=0; i<10; i++){
-            for (int j=0; j<10; j++) {
-                if (matrix[i][j] < 5) {
-                    //change color button
-                    btnTag[i][j].setBackgroundColor(Color.parseColor("#8AD2FF"));
-
-                } else if (matrix[i][j] < 10) {
-                    //change color button
-                    btnTag[i][j].setBackgroundColor(Color.parseColor("#8ABEFF"));
-
-                } else if (matrix[i][j] < 15) {
-                    //change color button
-                    btnTag[i][j].setBackgroundColor(Color.parseColor("#8AAAFF"));
-
-                } else {
-                    //change color button
-                    btnTag[i][j].setBackgroundColor(Color.parseColor("#8A96FF"));
-
-
-                }
-            }
-        }
-
-
-
     }
-
 
     private void enable_buttons() {
 
@@ -266,6 +234,85 @@ public class MainActivity extends AppCompatActivity {
             table.addView(tableRow);
         }
 
+    }
+    public void readFromDB() {
+        // Get data, order data "vak" (Poging 1 )
+        all_data =  new ArrayList<>();
+        CollectionReference locationsRef = db.collection("locations_8-4-3");
+        locationsRef.whereGreaterThan("time", System.currentTimeMillis() - 60000)
+                .orderBy("time")
+                .orderBy("Square")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                get_info= document.getData();
+                                String String_info=document.getString("Square");
+                                all_data.add(String_info);
+                                for (int i=0; i<all_data.size(); i++) {
+                                    System.out.println(all_data.get(i));
+                                    if (all_data.get(i).equals("None")) {
+                                        System.out.println("Out of range");
+                                        all_data.remove(all_data.get(i));
+                                    }
+                                }
+
+
+                                for (int i=0; i<all_data.size();i++) {
+                                    Object data = all_data.get(i);
+                                    System.out.println("Object : " + data);
+                                    String data_string = data.toString();
+                                    String x_square_string = data_string.substring(0, 1);
+                                    String y_square_string = data_string.substring(1, 2);
+                                    System.out.println("Data substring" + x_square_string + "second: " + y_square_string);
+                                    x_square = Integer.parseInt(x_square_string);
+                                    y_square = Integer.parseInt(y_square_string);
+//
+                                }
+                                System.out.println("Print value outside loop: " + x_square + "secondd" + y_square);
+
+
+
+                                for (int i = 0; i < 10; i++) {
+                                    for (int j = 0; j < 10; j++) {
+                                        if (i == x_square && j == y_square) {
+                                            matrix[i][j]++;
+                                        }
+                                    }
+                                }
+
+                                for (int i = 0; i < 10; i++) {
+                                    for (int j = 0; j < 10; j++) {
+                                        if (matrix[i][j] < 5) {
+                                            //change color button
+                                            btnTag[i][j].setBackgroundColor(Color.parseColor("#8AD2FF"));
+
+                                        } else if (matrix[i][j] < 10) {
+                                            //change color button
+                                            btnTag[i][j].setBackgroundColor(Color.parseColor("#8ABEFF"));
+
+                                        } else if (matrix[i][j] < 15) {
+                                            //change color button
+                                            btnTag[i][j].setBackgroundColor(Color.parseColor("#8AAAFF"));
+
+                                        } else {
+                                            //change color button
+                                            btnTag[i][j].setBackgroundColor(Color.parseColor("#8A96FF"));
+                                        }
+                                    }
+                                }
+
+                                Log.d("Firebase dataset", document.getId() + " => " + document.getData());
+                            }
+                            System.out.println("List: " +all_data);
+
+                        } else {
+                            Log.w("Firebase", "Error getting documents.", task.getException());
+                        }
+                    }
+                });
     }
 
 }
