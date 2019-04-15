@@ -54,52 +54,50 @@ public class GPS_Service extends Service {
                 double lon = location.getLongitude();
                 double lat = location.getLatitude();
 
-                double startLon = 4.7;
+                double startLon = 4.374030;
                 double endLon = 4.377568;
-                double addLon = (endLon - startLon) / 10;
+                double addLon = (endLon-startLon)/10;
 
                 double startLat = 52.002;
                 double endLat = 52.003344;
-                double addLat = (endLat - startLat) / 10;
+                double addLat = (endLat-startLat)/10;
 
-                int xVak = 0;
-                int yVak = 0;
-                String vak;
+                int latSquare = 0;
+                int lonSquare = 0;
+                String square;
 
                 if (lon < startLon || lon > (startLon + 10 * addLon) || lat < startLat || lat > (startLat + 10 * addLat)) {
-                    vak = "None";
+                    square = "None";
                 } else {
-                    // Loop y vakken
+                    // Loop latSquare
                     for (int j = 0; j < 10; j++) {
                         if (lat > startLat && lat < startLat + addLat) {
-                            System.out.println("yVak: " + yVak);
+                            System.out.println("LatSquare: " + latSquare);
                             break;
                         }
                         startLat = startLat + addLat;
-                        System.out.println(yVak);
-                        yVak++;
+                        System.out.println(latSquare);
+                        latSquare++;
                     }
 
-                    // Loop x vakken
+                    // Loop lonSquare
                     for (int k = 0; k < 10; k++) {
                         if (lon > startLon && lon < startLon + addLon) {
-                            System.out.println("xVak: " + xVak);
+                            System.out.println("lonSquare: " + lonSquare);
                             break;
                         }
                         startLon = startLon + addLon;
-                        xVak++;
+                        lonSquare++;
 
                     }
                     System.out.println("Lon= " + lon + " Lat= " + lat);
-                    System.out.println("xVak end= " + xVak);
-                    System.out.println("yVak end= " + yVak);
 
-                    vak = Integer.toString(xVak) + yVak;
+                    square = Integer.toString(latSquare) + lonSquare;
                 }
                 System.out.println("Send to Db");
-                service.sendToDb(vak);
+                service.sendToDb(square);
 
-                i.putExtra("coordinates", location.getLongitude() + " " + location.getLatitude() + " vak: " + vak);
+                i.putExtra("coordinates", location.getLongitude() + " " + location.getLatitude() + " vak: " + square);
                 sendBroadcast(i);
             }
 
@@ -136,13 +134,13 @@ public class GPS_Service extends Service {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, listener);
     }
 
-    public void sendToDb(String vak) {
+    public void sendToDb(String square) {
         // Create a new user with a first and last name
         Map<String, Object> value = new HashMap<>();
-        value.put("Square", vak);
+        value.put("Square", square);
         value.put("time", System.currentTimeMillis());
 
-        db.collection("locations_8-4-3")
+        db.collection("locations_15-4")
                 .add(value)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override

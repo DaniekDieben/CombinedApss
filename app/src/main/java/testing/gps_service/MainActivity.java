@@ -104,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 service.readFromDB();
                 handler.postDelayed(this, 10000);
+
             }
         };
         handler.postDelayed(r,10000);
@@ -230,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
             for (int j=0; j<10;j++){
                 Button bt = new Button(this);
                 bt.setLayoutParams(new TableRow.LayoutParams(50, 80));
+                bt.setBackgroundColor(getResources().getColor(R.color.Quiet));
                 matrix[i][j] = 0;
                 btnTag[i][j] = bt;
                 tableRow.addView(btnTag[i][j]);
@@ -240,10 +242,16 @@ public class MainActivity extends AppCompatActivity {
 
     }
     public void readFromDB() {
+
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                matrix[i][j]=0;
+            }
+        }
         // Get data, order data "vak" (Poging 1 )
         all_data =  new ArrayList<>();
-        CollectionReference locationsRef = db.collection("locations_8-4-3");
-        locationsRef.whereGreaterThan("time", System.currentTimeMillis() - 60000)
+        CollectionReference locationsRef = db.collection("locations_15-4");
+        locationsRef.whereGreaterThan("time", System.currentTimeMillis() - 10000)
                 .orderBy("time")
                 .orderBy("Square")
                 .get()
@@ -279,6 +287,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+
                                 for (int i = 0; i < 10; i++) {
                                     for (int j = 0; j < 10; j++) {
                                         if (i == x_square && j == y_square) {
@@ -287,17 +297,18 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 }
 
+
                                 for (int i = 0; i < 10; i++) {
                                     for (int j = 0; j < 10; j++) {
-                                        if (matrix[i][j] < 5) {
+                                        if (matrix[i][j] < 1) {
                                             //change color button
                                             btnTag[i][j].setBackgroundColor(getResources().getColor(R.color.Quiet));
 
-                                        } else if (matrix[i][j] < 10) {
+                                        } else if (matrix[i][j] <2 ) {
                                             //change color button
                                             btnTag[i][j].setBackgroundColor(getResources().getColor(R.color.Normal));
 
-                                        } else if (matrix[i][j] < 15) {
+                                        } else if (matrix[i][j] <3) {
                                             //change color button
                                             btnTag[i][j].setBackgroundColor(getResources().getColor(R.color.Crowded));
 
