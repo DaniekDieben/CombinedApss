@@ -4,11 +4,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="testing.gps_service.MainActivity">
+
+
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:srcCompat="@drawable/background" />
 
     <TableLayout
         android:id="@+id/TabelForButtons"
@@ -16,13 +23,18 @@
         android:layout_height="300dp"
         android:layout_marginTop="150dp"
         android:layout_centerHorizontal="true"
-        android:stretchColumns="*"></TableLayout>
+        android:stretchColumns="*">
+
+
+
+    </TableLayout>
+
 
     <Button
         android:id="@+id/button1"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:background="@color/rustig"
+        android:background="@color/Quiet"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
@@ -42,13 +54,13 @@
         android:layout_marginLeft="56dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="120dp"
-        android:background="@color/drukker" />
+        android:background="@color/Normal" />
 
     <Button
         android:id="@+id/button3"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:background="@color/druk"
+        android:background="@color/Crowded"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
@@ -68,7 +80,7 @@
         android:layout_marginLeft="56dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="200dp"
-        android:background="@color/drukst" />
+        android:background="@color/Very_crowded" />
 
     <Button
         android:id="@+id/start"
@@ -148,7 +160,7 @@
         android:layout_marginLeft="62dp"
         android:layout_marginBottom="140dp"
         app:srcCompat="@drawable/bar_symbol"
-         />
+        />
 
     <ImageView
         android:id="@+id/imageView3"
@@ -170,6 +182,7 @@
         android:layout_marginLeft="100dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="85dp"
+        android:textColor="@color/White"
         />
 
     <TextView
@@ -183,7 +196,7 @@
         android:layout_marginLeft="100dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="125dp"
-
+        android:textColor="@color/White"
         />
 
     <TextView
@@ -197,6 +210,7 @@
         android:layout_marginLeft="100dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="165dp"
+        android:textColor="@color/White"
         />
 
     <TextView
@@ -211,7 +225,10 @@
         android:layout_alignParentBottom="true"
         android:layout_marginLeft="100dp"
         android:layout_marginTop="5dp"
-        android:layout_marginBottom="205dp"/>
+        android:layout_marginBottom="205dp"
+        android:textColor="@color/White"
+        />
+
 
 
 

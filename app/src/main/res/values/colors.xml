@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorPrimaryDark">#2F333F</color>
     <color name="colorAccent">#D81B60</color>
     <color name="White">#FFFFFFFF</color>
     <color name="Silver">#C0C0C0</color>
@@ -19,8 +19,8 @@
     <color name="Navy">#FF000080</color>
     <color name="Fuchsia">#FFFF00FF</color>
     <color name="Purple">#FF800080</color>
-    <color name="rustig">#8AD2FF</color>
-    <color name="drukker">#8ABEFF</color>
-    <color name="druk">#8AAAFF</color>
-    <color name="drukst">#8A96FF</color>
+    <color name="Quiet">#8AD2FF</color>
+    <color name="Normal">#8ABEFF</color>
+    <color name="Crowded">#8AAAFF</color>
+    <color name="Very_crowded">#8A96FF</color>
 </resources>

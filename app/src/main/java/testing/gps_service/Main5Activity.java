@@ -9,19 +9,30 @@ import android.widget.Button;
 public class Main5Activity extends AppCompatActivity {
 
     Button btn_go_back;
-    Button btn_menu;
+    Button btn_openinghours;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main5);
         btn_go_back= (Button) findViewById(R.id.go_back);
+        btn_openinghours = (Button) findViewById(R.id.opening_hours);
         btn_go_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Main5Activity.this, MainActivity.class);
                 startActivity(intent);
             }
+        });
+
+        btn_openinghours.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Main5Activity.this, PopUpTimetable.class);
+                startActivity(intent);
+
+            }
+
         });
 
     }

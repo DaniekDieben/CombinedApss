@@ -1,35 +1,29 @@
 package testing.gps_service;
 
+import android.Manifest;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
-
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 
 
 public class GPS_Service extends Service {
@@ -60,51 +54,52 @@ public class GPS_Service extends Service {
                 double lon = location.getLongitude();
                 double lat = location.getLatitude();
 
-                double startLon = 4.335499;
-                double endLon = 4.3366;
-                double addLon = (endLon-startLon)/10;
+                double startLon = 4.7;
+                double endLon = 4.377568;
+                double addLon = (endLon - startLon) / 10;
 
-                double startLat = 51.994545;
-                double endLat = 51.996;
-                double addLat = (endLat-startLat)/10;
+                double startLat = 52.002;
+                double endLat = 52.003344;
+                double addLat = (endLat - startLat) / 10;
 
                 int xVak = 0;
                 int yVak = 0;
                 String vak;
 
-                if (lon < startLon || lon > (startLon + 10*addLon) || lat < startLat || lat > (startLat + 10*addLat)){
+                if (lon < startLon || lon > (startLon + 10 * addLon) || lat < startLat || lat > (startLat + 10 * addLat)) {
                     vak = "None";
-                }
-                else {
+                } else {
                     // Loop y vakken
-                    for (int j=0; j<10; j++){
-                        if (lat > startLat && lat < startLat + addLat){
-                            System.out.println("yVak: " +yVak);
-                            break;}
+                    for (int j = 0; j < 10; j++) {
+                        if (lat > startLat && lat < startLat + addLat) {
+                            System.out.println("yVak: " + yVak);
+                            break;
+                        }
                         startLat = startLat + addLat;
                         System.out.println(yVak);
-                        yVak ++;
+                        yVak++;
                     }
 
                     // Loop x vakken
-                    for (int k=0; k<10; k++){
-                        if (lon > startLon && lon < startLon + addLon){
-                            System.out.println("xVak: " +xVak);
-                            break;}
+                    for (int k = 0; k < 10; k++) {
+                        if (lon > startLon && lon < startLon + addLon) {
+                            System.out.println("xVak: " + xVak);
+                            break;
+                        }
                         startLon = startLon + addLon;
-                        xVak ++;
+                        xVak++;
 
                     }
-                    System.out.println("Lon= "+lon+ " Lat= "+lat);
-                    System.out.println("xVak end= "+xVak);
-                    System.out.println("yVak end= " +yVak);
+                    System.out.println("Lon= " + lon + " Lat= " + lat);
+                    System.out.println("xVak end= " + xVak);
+                    System.out.println("yVak end= " + yVak);
 
-                    vak = Integer.toString(xVak)+yVak;
+                    vak = Integer.toString(xVak) + yVak;
                 }
                 System.out.println("Send to Db");
                 service.sendToDb(vak);
 
-                i.putExtra("coordinates",location.getLongitude()+" "+location.getLatitude()+" vak: "+ vak);
+                i.putExtra("coordinates", location.getLongitude() + " " + location.getLatitude() + " vak: " + vak);
                 sendBroadcast(i);
             }
 
@@ -120,15 +115,25 @@ public class GPS_Service extends Service {
 
             @Override
             public void onProviderDisabled(String s) {
-                    Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(i);
             }
         };
 
         locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         //noinspection MissingPermission
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,10000,0,listener);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, listener);
     }
 
     public void sendToDb(String vak) {

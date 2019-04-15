@@ -31,9 +31,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firestore.v1.Value;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
 //    private TableLayout table;
     private Button[][] btnTag = new Button [10][10];
     private int[][] matrix = new int [10][10] ;
+
     TextView text;
     TextView text2;
     TextView text3;
@@ -68,19 +67,19 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if(broadcastReceiver == null){
-            broadcastReceiver = new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    System.out.println("\n" +intent.getExtras().get("coordinates"));
-                }
-            };
-        }
-        registerReceiver(broadcastReceiver,new IntentFilter("location_update"));
-    }
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        if(broadcastReceiver == null){
+//            broadcastReceiver = new BroadcastReceiver() {
+//                @Override
+//                public void onReceive(Context context, Intent intent) {
+//                    System.out.println("\n" +intent.getExtras().get("coordinates"));
+//                }
+//            };
+//        }
+//        registerReceiver(broadcastReceiver,new IntentFilter("location_update"));
+//    }
 
     @Override
     protected void onDestroy() {
@@ -94,10 +93,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // layout main activity
         setContentView(R.layout.activity_main);
 
+        // checks DB info every 10 sec
         final Handler handler = new Handler();
-        // 5 sec
+        // 10 sec
         Runnable r = new Runnable() {
             @Override
             public void run() {
@@ -107,16 +108,19 @@ public class MainActivity extends AppCompatActivity {
         };
         handler.postDelayed(r,10000);
 
-
+        //start or stop the service
         btn_start = (Button) findViewById(R.id.start);
         btn_stop = (Button) findViewById(R.id.stop);
 
         FirebaseApp.initializeApp(this);
         db = FirebaseFirestore.getInstance();
 
+        //gps permission needed before enable buttons
         if(!runtime_permissions())
             enable_buttons();
 
+
+        //images stages
         imgView1 = (ImageView) findViewById(R.id.imageView);
         imgView1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Dynamic buttons
         populateButtons();
 
         text = (TextView) findViewById(R.id.textView);
@@ -218,7 +223,6 @@ public class MainActivity extends AppCompatActivity {
     private void populateButtons() {
         TableLayout table= (TableLayout) findViewById((R.id.TabelForButtons));
 
-        int k = 0;
         for (int i=0; i<10; i++){
             TableRow tableRow = new TableRow(this);
             tableRow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,TableRow.LayoutParams.MATCH_PARENT));
@@ -287,19 +291,19 @@ public class MainActivity extends AppCompatActivity {
                                     for (int j = 0; j < 10; j++) {
                                         if (matrix[i][j] < 5) {
                                             //change color button
-                                            btnTag[i][j].setBackgroundColor(Color.parseColor("#8AD2FF"));
+                                            btnTag[i][j].setBackgroundColor(getResources().getColor(R.color.Quiet));
 
                                         } else if (matrix[i][j] < 10) {
                                             //change color button
-                                            btnTag[i][j].setBackgroundColor(Color.parseColor("#8ABEFF"));
+                                            btnTag[i][j].setBackgroundColor(getResources().getColor(R.color.Normal));
 
                                         } else if (matrix[i][j] < 15) {
                                             //change color button
-                                            btnTag[i][j].setBackgroundColor(Color.parseColor("#8AAAFF"));
+                                            btnTag[i][j].setBackgroundColor(getResources().getColor(R.color.Crowded));
 
                                         } else {
                                             //change color button
-                                            btnTag[i][j].setBackgroundColor(Color.parseColor("#8A96FF"));
+                                            btnTag[i][j].setBackgroundColor(getResources().getColor(R.color.Very_crowded));
                                         }
                                     }
                                 }
