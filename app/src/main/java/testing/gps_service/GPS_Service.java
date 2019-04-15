@@ -1,6 +1,7 @@
 package testing.gps_service;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -32,55 +33,59 @@ public class GPS_Service extends Service {
     private LocationManager locationManager;
     private FirebaseFirestore db;
 
+
     @Nullable
     @Override
+
     public IBinder onBind(Intent intent) {
         return null;
     }
-
+    //allows to bind activities to the service; send requests and receive responses
+    @SuppressLint("MissingPermission")
     @Override
     public void onCreate() {
 
         FirebaseApp.initializeApp(this);
         db = FirebaseFirestore.getInstance();
-
         final GPS_Service service = this;
 
+        //Locationlistener receives notification when location has changed
         listener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                Intent i = new Intent("location_update");
 
+                // get longitude and latitude and save as double.
                 double lon = location.getLongitude();
                 double lat = location.getLatitude();
 
-                double startLon = 4.374030;
-                double endLon = 4.377568;
+                //create threshold values for main terrain, divide this into 10 squares in both x as y direction. So create 100 squares which matches the matrix in MainActivity
+                double startLon = 4.3596;
+                double endLon = 4.366;
                 double addLon = (endLon-startLon)/10;
 
-                double startLat = 52.002;
-                double endLat = 52.003344;
+                double startLat = 51.9804;
+                double endLat = 51.985;
                 double addLat = (endLat-startLat)/10;
 
                 int latSquare = 0;
                 int lonSquare = 0;
                 String square;
 
+                //check if coordinates are in the set main terrain, if not square is none.
                 if (lon < startLon || lon > (startLon + 10 * addLon) || lat < startLat || lat > (startLat + 10 * addLat)) {
                     square = "None";
                 } else {
-                    // Loop latSquare
+                    // For loop to see in which square the Latitude coordinates fit
                     for (int j = 0; j < 10; j++) {
                         if (lat > startLat && lat < startLat + addLat) {
                             System.out.println("LatSquare: " + latSquare);
                             break;
                         }
                         startLat = startLat + addLat;
-                        System.out.println(latSquare);
                         latSquare++;
                     }
 
-                    // Loop lonSquare
+                    // For loop to see in which square the Longitude coordinates fit
                     for (int k = 0; k < 10; k++) {
                         if (lon > startLon && lon < startLon + addLon) {
                             System.out.println("lonSquare: " + lonSquare);
@@ -92,13 +97,14 @@ public class GPS_Service extends Service {
                     }
                     System.out.println("Lon= " + lon + " Lat= " + lat);
 
+                    //combine squares of longitude and latitude to send to database, later used to index in the matrix
                     square = Integer.toString(latSquare) + lonSquare;
                 }
                 System.out.println("Send to Db");
                 service.sendToDb(square);
 
-                i.putExtra("coordinates", location.getLongitude() + " " + location.getLatitude() + " vak: " + square);
-                sendBroadcast(i);
+//                i.putExtra("coordinates", location.getLongitude() + " " + location.getLatitude() + " vak: " + square);
+//                sendBroadcast(i);
             }
 
             @Override
@@ -113,34 +119,25 @@ public class GPS_Service extends Service {
 
             @Override
             public void onProviderDisabled(String s) {
+                // if location services are disabled on the phone, send user to settings through a intent to enable them
                 Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(i);
             }
         };
-
+        //locationManager provides access to system location services
         locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         //noinspection MissingPermission
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, listener);
+        //listen for updates every 5 sec
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, listener);
     }
 
     public void sendToDb(String square) {
-        // Create a new user with a first and last name
         Map<String, Object> value = new HashMap<>();
         value.put("Square", square);
         value.put("time", System.currentTimeMillis());
 
-        db.collection("locations_15-4")
+        db.collection("locations_test")
                 .add(value)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
@@ -157,9 +154,8 @@ public class GPS_Service extends Service {
                 });
     }
 
-
-
     @Override
+    // when service is destroyed locationlistenere should stop listening, to avoid memory leak
     public void onDestroy() {
         super.onDestroy();
         if(locationManager != null){

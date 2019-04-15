@@ -4,21 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Main3Activity">
+    tools:context=".TheaterActivity">
 
 
     <ImageView
         android:id="@+id/imageView6"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:srcCompat="@drawable/pancake_corner"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
+        android:layout_marginStart="0dp"
         android:layout_marginLeft="0dp"
         android:layout_marginTop="0dp"
         android:layout_marginBottom="0dp"
-        android:layout_marginStart="0dp" />
+        android:scaleType="fitXY"
+        app:srcCompat="@drawable/winebar" />
 
     <Button
         android:id="@+id/go_back"
@@ -31,13 +32,13 @@
         />
 
     <Button
-        android:id="@+id/Menu"
+        android:id="@+id/menu_bar"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:text="Menu"
         android:textColor="@color/White"
         android:textSize="20sp"
-        android:layout_marginTop="320dp"
+        android:layout_marginTop="310dp"
         android:layout_centerHorizontal="true"
         android:background="@android:color/transparent"/>
 

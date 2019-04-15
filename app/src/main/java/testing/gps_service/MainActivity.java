@@ -3,11 +3,8 @@ package testing.gps_service;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
@@ -54,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     ImageView imgView4;
 
     private Button btn_start, btn_stop;
-    private BroadcastReceiver broadcastReceiver;
+//    private BroadcastReceiver broadcastReceiver;
 
     private FirebaseFirestore db;
     public ArrayList all_data;
@@ -65,29 +62,6 @@ public class MainActivity extends AppCompatActivity {
 
     final MainActivity service = this;
 
-
-
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        if(broadcastReceiver == null){
-//            broadcastReceiver = new BroadcastReceiver() {
-//                @Override
-//                public void onReceive(Context context, Intent intent) {
-//                    System.out.println("\n" +intent.getExtras().get("coordinates"));
-//                }
-//            };
-//        }
-//        registerReceiver(broadcastReceiver,new IntentFilter("location_update"));
-//    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if(broadcastReceiver != null){
-            unregisterReceiver(broadcastReceiver);
-        }
-    }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -103,11 +77,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 service.readFromDB();
-                handler.postDelayed(this, 10000);
+                handler.postDelayed(this, 5000);
 
             }
         };
-        handler.postDelayed(r,10000);
+        handler.postDelayed(r,5000);
 
         //start or stop the service
         btn_start = (Button) findViewById(R.id.start);
@@ -116,51 +90,55 @@ public class MainActivity extends AppCompatActivity {
         FirebaseApp.initializeApp(this);
         db = FirebaseFirestore.getInstance();
 
-        //gps permission needed before enable buttons
+        //if permission is already given or not needed (checked via runtime_permissions()), then enable buttons
         if(!runtime_permissions())
             enable_buttons();
 
 
-        //images stages
-        imgView1 = (ImageView) findViewById(R.id.imageView);
+        //clickable images festival activities with intent to their own activity class
+        imgView1 = (ImageView) findViewById(R.id.stage_image);
         imgView1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, Main2Activity.class);
+                Intent intent = new Intent(MainActivity.this, StageActivity.class);
                 startActivity(intent);
             }
         });
-        imgView2 = (ImageView) findViewById(R.id.imageView2);
+        imgView2 = (ImageView) findViewById(R.id.food_image);
         imgView2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, Main3Activity.class);
+                Intent intent = new Intent(MainActivity.this, FoodActivity.class);
                 startActivity(intent);
             }
         });
-        imgView3 = (ImageView) findViewById(R.id.imageView3);
+        imgView3 = (ImageView) findViewById(R.id.theater_image);
         imgView3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, Main4Activity.class);
+                Intent intent = new Intent(MainActivity.this, TheaterActivity.class);
                 startActivity(intent);
             }
         });
-        imgView4 = (ImageView) findViewById(R.id.imageView4);
+        imgView4 = (ImageView) findViewById(R.id.bar_image);
         imgView4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, Main5Activity.class);
+                Intent intent = new Intent(MainActivity.this, BarActivity.class);
                 startActivity(intent);
             }
         });
 
-        //Dynamic buttons
+        //Dynamic buttons populated
         populateButtons();
 
-        text = (TextView) findViewById(R.id.textView);
         Typeface myCustomFont= Typeface.createFromAsset(getAssets(),"fonts/futura_light.otf");
+        Typeface myCustomFontMedium= Typeface.createFromAsset(getAssets(),"fonts/futura_medium.otf");
+
+        text = (TextView) findViewById(R.id.textView);
         text.setTypeface(myCustomFont);
+        text2 = (TextView) findViewById(R.id.textView2);
+        text2.setTypeface(myCustomFontMedium);
         text3 = (TextView) findViewById(R.id.textView3);
         text3.setTypeface(myCustomFont);
         text4 = (TextView) findViewById(R.id.textView4);
@@ -169,9 +147,7 @@ public class MainActivity extends AppCompatActivity {
         text5.setTypeface(myCustomFont);
         text6 = (TextView) findViewById(R.id.textView6);
         text6.setTypeface(myCustomFont);
-        text2 = (TextView) findViewById(R.id.textView2);
-        myCustomFont= Typeface.createFromAsset(getAssets(),"fonts/futura_medium.otf");
-        text2.setTypeface(myCustomFont);
+
 
     }
 
@@ -180,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
         btn_start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // new intent pointing to gps service, starting service
                 Intent i =new Intent(getApplicationContext(),GPS_Service.class);
                 startService(i);
                 System.out.println("Start");
@@ -189,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
         btn_stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                // new intent pointing to gps service, stopping service
                 Intent i = new Intent(getApplicationContext(),GPS_Service.class);
                 stopService(i);
                 System.out.println("Stop");
@@ -200,18 +177,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean runtime_permissions() {
+        //To make app working for android 23 and higher, we need user permission. So if higher then 23 and permission not granted yet, ask for permission
         if(Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
 
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},100);
+            //requestcode for permission checking should be unique: 100
 
             return true;
         }
+        //if we dont need to ask for permission
         return false;
     }
 
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        //check is requestcode is same as set request code in runtime_permissions() and both permissions are granted. If true, enable buttons
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(requestCode == 100){
             if( grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
@@ -223,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void populateButtons() {
         TableLayout table= (TableLayout) findViewById((R.id.TabelForButtons));
-
+         // create button matrix of 10 by 10 with right color and size dynamically to make sure we can access them easily through a loop
         for (int i=0; i<10; i++){
             TableRow tableRow = new TableRow(this);
             tableRow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,TableRow.LayoutParams.MATCH_PARENT));
@@ -235,23 +216,22 @@ public class MainActivity extends AppCompatActivity {
                 matrix[i][j] = 0;
                 btnTag[i][j] = bt;
                 tableRow.addView(btnTag[i][j]);
-
             }
             table.addView(tableRow);
         }
 
     }
     public void readFromDB() {
-
+        // make sure that the old values are removed from the matrix
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
                 matrix[i][j]=0;
             }
         }
-        // Get data, order data "vak" (Poging 1 )
+        // Get data, filter by time (only last 10 sec) and order by square
         all_data =  new ArrayList<>();
-        CollectionReference locationsRef = db.collection("locations_15-4");
-        locationsRef.whereGreaterThan("time", System.currentTimeMillis() - 10000)
+        CollectionReference locationsRef = db.collection("locations_test");
+        locationsRef.whereGreaterThan("time", System.currentTimeMillis() - 5000)
                 .orderBy("time")
                 .orderBy("Square")
                 .get()
@@ -262,33 +242,29 @@ public class MainActivity extends AppCompatActivity {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 get_info= document.getData();
                                 String String_info=document.getString("Square");
+                                //add all data to the arraylist
                                 all_data.add(String_info);
                                 for (int i=0; i<all_data.size(); i++) {
-                                    System.out.println(all_data.get(i));
+                                    // filter all "None" out of the list
                                     if (all_data.get(i).equals("None")) {
-                                        System.out.println("Out of range");
+                                        // location is out of range and not usefull, so delete from Arraylist
                                         all_data.remove(all_data.get(i));
                                     }
                                 }
 
-
                                 for (int i=0; i<all_data.size();i++) {
+                                    // convert data into separate substrings, one for each square (square goes from 0-9 so each can only be 1 element long.
                                     Object data = all_data.get(i);
-                                    System.out.println("Object : " + data);
                                     String data_string = data.toString();
                                     String x_square_string = data_string.substring(0, 1);
                                     String y_square_string = data_string.substring(1, 2);
-                                    System.out.println("Data substring" + x_square_string + "second: " + y_square_string);
+                                    //convert substring to integer to be able to use for loops
                                     x_square = Integer.parseInt(x_square_string);
                                     y_square = Integer.parseInt(y_square_string);
 //
                                 }
-                                System.out.println("Print value outside loop: " + x_square + "secondd" + y_square);
 
-
-
-
-
+                                //double for loop to match the two square int value to the matrix index. If match add 1 to the matrix
                                 for (int i = 0; i < 10; i++) {
                                     for (int j = 0; j < 10; j++) {
                                         if (i == x_square && j == y_square) {
@@ -297,7 +273,7 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 }
 
-
+                                //check all values of the whole matrix, if value above certain threshold, change color.
                                 for (int i = 0; i < 10; i++) {
                                     for (int j = 0; j < 10; j++) {
                                         if (matrix[i][j] < 1) {

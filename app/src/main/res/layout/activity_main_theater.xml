@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Main2Activity">
+    tools:context=".TheaterActivity">
 
 
     <ImageView
@@ -18,7 +18,8 @@
         android:layout_marginLeft="0dp"
         android:layout_marginTop="0dp"
         android:layout_marginBottom="0dp"
-        app:srcCompat="@drawable/alpha_stage" />
+        android:scaleType="fitXY"
+        app:srcCompat="@drawable/maxx_theather" />
 
     <Button
         android:id="@+id/go_back"
@@ -31,29 +32,26 @@
         />
 
     <Button
-        android:id="@+id/Artists_schedule"
+        android:id="@+id/theater_schedule"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:text="Artists Schedule"
+        android:text="Schedule"
         android:textColor="@color/White"
         android:textSize="20sp"
-        android:layout_marginTop="320dp"
+        android:layout_marginTop="310dp"
         android:layout_centerHorizontal="true"
         android:background="@android:color/transparent"/>
 
     <Button
         android:id="@+id/opening_hours"
-        android:layout_width="363dp"
-        android:layout_height="68dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginStart="43dp"
-        android:layout_marginLeft="43dp"
-        android:layout_marginTop="610dp"
-        android:background="@android:color/transparent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="Opening Hours"
-        android:textColor="@color/White"
-        android:textSize="20sp" />
+        android:background="@android:color/transparent"
+        android:layout_marginTop="610dp"
+        android:layout_centerHorizontal="true"
+        android:textSize="20sp"
+        android:textColor="@color/White"/>
 
 
 </RelativeLayout>
