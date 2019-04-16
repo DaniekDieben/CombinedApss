@@ -251,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 }
 
-                                process_data();
+                                processData();
                                 Log.d("Firebase dataset", document.getId() + " => " + document.getData());
                             }
                             System.out.println("List: " +all_data);
@@ -262,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
-    public void process_data(){
+    public void processData(){
         for (int i=0; i<all_data.size();i++) {
             // convert data into separate substrings, one for each square (square goes from 0-9 so each can only be 1 element long.
             Object data = all_data.get(i);
