@@ -70,6 +70,13 @@ public class MainActivity extends AppCompatActivity {
         // layout main activity
         setContentView(R.layout.activity_main);
 
+        //start or stop the service
+        btn_start = (Button) findViewById(R.id.start);
+        btn_stop = (Button) findViewById(R.id.stop);
+
+        FirebaseApp.initializeApp(this);
+        db = FirebaseFirestore.getInstance();
+
         // checks DB info every 10 sec
         final Handler handler = new Handler();
         // 10 sec
@@ -83,17 +90,12 @@ public class MainActivity extends AppCompatActivity {
         };
         handler.postDelayed(r,5000);
 
-        //start or stop the service
-        btn_start = (Button) findViewById(R.id.start);
-        btn_stop = (Button) findViewById(R.id.stop);
-
-        FirebaseApp.initializeApp(this);
-        db = FirebaseFirestore.getInstance();
-
         //if permission is already given or not needed (checked via runtime_permissions()), then enable buttons
         if(!runtime_permissions())
             enable_buttons();
 
+        //Dynamic buttons populated
+        populateButtons();
 
         //clickable images festival activities with intent to their own activity class
         imgView1 = (ImageView) findViewById(R.id.stage_image);
@@ -129,8 +131,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //Dynamic buttons populated
-        populateButtons();
 
         Typeface myCustomFont= Typeface.createFromAsset(getAssets(),"fonts/futura_light.otf");
         Typeface myCustomFontMedium= Typeface.createFromAsset(getAssets(),"fonts/futura_medium.otf");
@@ -147,7 +147,6 @@ public class MainActivity extends AppCompatActivity {
         text5.setTypeface(myCustomFont);
         text6 = (TextView) findViewById(R.id.textView6);
         text6.setTypeface(myCustomFont);
-
 
     }
 
@@ -252,49 +251,7 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 }
 
-                                for (int i=0; i<all_data.size();i++) {
-                                    // convert data into separate substrings, one for each square (square goes from 0-9 so each can only be 1 element long.
-                                    Object data = all_data.get(i);
-                                    String data_string = data.toString();
-                                    String x_square_string = data_string.substring(0, 1);
-                                    String y_square_string = data_string.substring(1, 2);
-                                    //convert substring to integer to be able to use for loops
-                                    x_square = Integer.parseInt(x_square_string);
-                                    y_square = Integer.parseInt(y_square_string);
-//
-                                }
-
-                                //double for loop to match the two square int value to the matrix index. If match add 1 to the matrix
-                                for (int i = 0; i < 10; i++) {
-                                    for (int j = 0; j < 10; j++) {
-                                        if (i == x_square && j == y_square) {
-                                            matrix[i][j]++;
-                                        }
-                                    }
-                                }
-
-                                //check all values of the whole matrix, if value above certain threshold, change color.
-                                for (int i = 0; i < 10; i++) {
-                                    for (int j = 0; j < 10; j++) {
-                                        if (matrix[i][j] < 1) {
-                                            //change color button
-                                            btnTag[i][j].setBackgroundColor(getResources().getColor(R.color.Quiet));
-
-                                        } else if (matrix[i][j] <2 ) {
-                                            //change color button
-                                            btnTag[i][j].setBackgroundColor(getResources().getColor(R.color.Normal));
-
-                                        } else if (matrix[i][j] <3) {
-                                            //change color button
-                                            btnTag[i][j].setBackgroundColor(getResources().getColor(R.color.Crowded));
-
-                                        } else {
-                                            //change color button
-                                            btnTag[i][j].setBackgroundColor(getResources().getColor(R.color.Very_crowded));
-                                        }
-                                    }
-                                }
-
+                                process_data();
                                 Log.d("Firebase dataset", document.getId() + " => " + document.getData());
                             }
                             System.out.println("List: " +all_data);
@@ -304,6 +261,49 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+    public void process_data(){
+        for (int i=0; i<all_data.size();i++) {
+            // convert data into separate substrings, one for each square (square goes from 0-9 so each can only be 1 element long.
+            Object data = all_data.get(i);
+            String data_string = data.toString();
+            String x_square_string = data_string.substring(0, 1);
+            String y_square_string = data_string.substring(1, 2);
+            //convert substring to integer to be able to use for loops
+            x_square = Integer.parseInt(x_square_string);
+            y_square = Integer.parseInt(y_square_string);
+//
+        }
+        //double for loop to match the two square int value to the matrix index. If match add 1 to the matrix
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                if (i == x_square && j == y_square) {
+                    matrix[i][j]++;
+                }
+            }
+        }
+        //check all values of the whole matrix, if value above certain threshold, change color.
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                if (matrix[i][j] < 1) {
+                    //change color button
+                    btnTag[i][j].setBackgroundColor(getResources().getColor(R.color.Quiet));
+
+                } else if (matrix[i][j] <2 ) {
+                    //change color button
+                    btnTag[i][j].setBackgroundColor(getResources().getColor(R.color.Normal));
+
+                } else if (matrix[i][j] <3) {
+                    //change color button
+                    btnTag[i][j].setBackgroundColor(getResources().getColor(R.color.Crowded));
+
+                } else {
+                    //change color button
+                    btnTag[i][j].setBackgroundColor(getResources().getColor(R.color.Very_crowded));
+                }
+            }
+        }
+
     }
 
 }
