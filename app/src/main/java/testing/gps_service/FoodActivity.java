@@ -11,7 +11,7 @@ public class FoodActivity extends AppCompatActivity {
 
     Button btn_go_back;
     Button btn_openinghours;
-    Button btn_menu_bar;
+    Button btn_menu_food;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +25,7 @@ public class FoodActivity extends AppCompatActivity {
         btn_go_back.setTypeface(myCustomFont);
         btn_openinghours = (Button) findViewById(R.id.opening_hours);
         btn_openinghours.setTypeface(myCustomFont);
-        btn_menu_bar= (Button) findViewById(R.id.menu_bar);
+        btn_menu_food= (Button) findViewById(R.id.menu);
 
 
         btn_go_back.setOnClickListener(new View.OnClickListener() {
@@ -46,14 +46,14 @@ public class FoodActivity extends AppCompatActivity {
 
         });
 
-//        btn_menu_bar.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(FoodActivity.this, FoodMenuActivity.class);
-//                startActivity(intent);
-//
-//            }
-//
-//        });
+        btn_menu_food.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(FoodActivity.this, FoodMenuActivity.class);
+                startActivity(intent);
+
+            }
+
+        });
     }
 }

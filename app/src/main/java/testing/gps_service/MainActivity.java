@@ -2,7 +2,6 @@ package testing.gps_service;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
@@ -179,6 +178,8 @@ public class MainActivity extends AppCompatActivity {
         //To make app working for android 23 and higher, we need user permission. So if higher then 23 and permission not granted yet, ask for permission
         if(Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
 
+
+
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},100);
             //requestcode for permission checking should be unique: 100
 
@@ -263,47 +264,50 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
     public void processData(){
-        for (int i=0; i<all_data.size();i++) {
-            // convert data into separate substrings, one for each square (square goes from 0-9 so each can only be 1 element long.
-            Object data = all_data.get(i);
-            String data_string = data.toString();
-            String x_square_string = data_string.substring(0, 1);
-            String y_square_string = data_string.substring(1, 2);
-            //convert substring to integer to be able to use for loops
-            x_square = Integer.parseInt(x_square_string);
-            y_square = Integer.parseInt(y_square_string);
-//
+        if (all_data.size() != 0){
+            for (int i=0; i<all_data.size();i++) {
+                // convert data into separate substrings, one for each square (square goes from 0-9 so each can only be 1 element long.
+                Object data = all_data.get(i);
+                String data_string = data.toString();
+                String x_square_string = data_string.substring(0, 1);
+                String y_square_string = data_string.substring(1, 2);
+                //convert substring to integer to be able to use for loops
+                x_square = Integer.parseInt(x_square_string);
+                y_square = Integer.parseInt(y_square_string);
         }
-        //double for loop to match the two square int value to the matrix index. If match add 1 to the matrix
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
-                if (i == x_square && j == y_square) {
-                    matrix[i][j]++;
+
+
+
+            //double for loop to match the two square int value to the matrix index. If match add 1 to the matrix
+            for (int i = 0; i < 10; i++) {
+                for (int j = 0; j < 10; j++) {
+                    if (i == x_square && j == y_square) {
+                        matrix[i][j]++;
+                    }
+                }
+            }
+            System.out.println(matrix[0][0]);
+            //check all values of the whole matrix, if value above certain threshold, change color.
+            for (int i = 0; i < 10; i++) {
+                for (int j = 0; j < 10; j++) {
+                    if (matrix[i][j] < 1) {
+                        //change color button
+                        btnTag[i][j].setBackgroundColor(getResources().getColor(R.color.Quiet));
+
+                    } else if (matrix[i][j] <2 ) {
+                        //change color button
+                        btnTag[i][j].setBackgroundColor(getResources().getColor(R.color.Normal));
+
+                    } else if (matrix[i][j] <3) {
+                        //change color button
+                        btnTag[i][j].setBackgroundColor(getResources().getColor(R.color.Crowded));
+
+                    } else {
+                        //change color button
+                        btnTag[i][j].setBackgroundColor(getResources().getColor(R.color.Very_crowded));
+                    }
                 }
             }
         }
-        //check all values of the whole matrix, if value above certain threshold, change color.
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
-                if (matrix[i][j] < 1) {
-                    //change color button
-                    btnTag[i][j].setBackgroundColor(getResources().getColor(R.color.Quiet));
-
-                } else if (matrix[i][j] <2 ) {
-                    //change color button
-                    btnTag[i][j].setBackgroundColor(getResources().getColor(R.color.Normal));
-
-                } else if (matrix[i][j] <3) {
-                    //change color button
-                    btnTag[i][j].setBackgroundColor(getResources().getColor(R.color.Crowded));
-
-                } else {
-                    //change color button
-                    btnTag[i][j].setBackgroundColor(getResources().getColor(R.color.Very_crowded));
-                }
-            }
-        }
-
     }
-
 }

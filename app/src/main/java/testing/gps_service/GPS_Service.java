@@ -1,11 +1,9 @@
 package testing.gps_service;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -14,7 +12,6 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -57,19 +54,23 @@ public class GPS_Service extends Service {
                 // get longitude and latitude and save as double.
                 double lon = location.getLongitude();
                 double lat = location.getLatitude();
+                System.out.println(lon + "  "+lat);
 
-                //create threshold values for main terrain, divide this into 10 squares in both x as y direction. So create 100 squares which matches the matrix in MainActivity
-                double startLon = 4.3596;
-                double endLon = 4.366;
+                //create threshold values for main terrain, divide this into 10 squares in both x as y direction.
+                // So create 100 squares which matches the matrix in MainActivity
+
+                double startLon = 4.374030;
+                double endLon = 4.377568;
                 double addLon = (endLon-startLon)/10;
 
-                double startLat = 51.9804;
-                double endLat = 51.985;
+                double startLat = 52.002;
+                double endLat = 52.003344;
                 double addLat = (endLat-startLat)/10;
 
                 int latSquare = 0;
                 int lonSquare = 0;
                 String square;
+
 
                 //check if coordinates are in the set main terrain, if not square is none.
                 if (lon < startLon || lon > (startLon + 10 * addLon) || lat < startLat || lat > (startLat + 10 * addLat)) {
@@ -103,8 +104,7 @@ public class GPS_Service extends Service {
                 System.out.println("Send to Db");
                 service.sendToDb(square);
 
-//                i.putExtra("coordinates", location.getLongitude() + " " + location.getLatitude() + " vak: " + square);
-//                sendBroadcast(i);
+
             }
 
             @Override
